@@ -10,6 +10,7 @@ import (
 type Node interface {
 	TokenLiteral() string
 	String() string
+	Line() int
 }
 
 // Statement nodes implement this
@@ -47,6 +48,9 @@ func (p *Program) String() string {
 	return out.String()
 }
 
+// Line return line number
+func (p *Program) Line() int { return 0 }
+
 // Statements
 
 // LetStatement node
@@ -76,6 +80,9 @@ func (ls *LetStatement) String() string {
 	return out.String()
 }
 
+// Line return line number
+func (ls *LetStatement) Line() int { return ls.Token.Line }
+
 // ReturnStatement node
 type ReturnStatement struct {
 	Token       token.Token // the 'return' token
@@ -100,6 +107,9 @@ func (rs *ReturnStatement) String() string {
 	return out.String()
 }
 
+// Line return line number
+func (rs *ReturnStatement) Line() int { return rs.Token.Line }
+
 // ExpressionStatement node
 type ExpressionStatement struct {
 	Token      token.Token // the first token of the expression
@@ -116,6 +126,9 @@ func (es *ExpressionStatement) String() string {
 	}
 	return ""
 }
+
+// Line return line number
+func (es *ExpressionStatement) Line() int { return es.Token.Line }
 
 // BlockStatement node
 type BlockStatement struct {
@@ -137,6 +150,9 @@ func (bs *BlockStatement) String() string {
 	return out.String()
 }
 
+// Line return line number
+func (bs *BlockStatement) Line() int { return bs.Token.Line }
+
 // Expressions
 
 // Identifier node
@@ -151,6 +167,9 @@ func (i *Identifier) expressionNode() {}
 func (i *Identifier) TokenLiteral() string { return i.Token.Literal }
 func (i *Identifier) String() string       { return i.Value }
 
+// Line return line number
+func (i *Identifier) Line() int { return i.Token.Line }
+
 // Boolean node
 type Boolean struct {
 	Token token.Token
@@ -163,6 +182,9 @@ func (b *Boolean) expressionNode() {}
 func (b *Boolean) TokenLiteral() string { return b.Token.Literal }
 func (b *Boolean) String() string       { return b.Token.Literal }
 
+// Line return line number
+func (b *Boolean) Line() int { return b.Token.Line }
+
 // IntegerLiteral node
 type IntegerLiteral struct {
 	Token token.Token
@@ -174,6 +196,9 @@ func (il *IntegerLiteral) expressionNode() {}
 // TokenLiteral return literal for integer literal
 func (il *IntegerLiteral) TokenLiteral() string { return il.Token.Literal }
 func (il *IntegerLiteral) String() string       { return il.Token.Literal }
+
+// Line return line number
+func (il *IntegerLiteral) Line() int { return il.Token.Line }
 
 // PrefixExpression node
 type PrefixExpression struct {
@@ -196,6 +221,9 @@ func (pe *PrefixExpression) String() string {
 
 	return out.String()
 }
+
+// Line return line number
+func (pe *PrefixExpression) Line() int { return pe.Token.Line }
 
 // InfixExpression node
 type InfixExpression struct {
@@ -220,6 +248,9 @@ func (ie *InfixExpression) String() string {
 
 	return out.String()
 }
+
+// Line return line number
+func (ie *InfixExpression) Line() int { return ie.Token.Line }
 
 // IfExpression node
 type IfExpression struct {
@@ -249,6 +280,9 @@ func (ie *IfExpression) String() string {
 	return out.String()
 }
 
+// Line return line number
+func (ie *IfExpression) Line() int { return ie.Token.Line }
+
 // FunctionLiteral node
 type FunctionLiteral struct {
 	Token      token.Token // The 'fn' token
@@ -277,6 +311,9 @@ func (fl *FunctionLiteral) String() string {
 	return out.String()
 }
 
+// Line return line number
+func (fl *FunctionLiteral) Line() int { return fl.Token.Line }
+
 // CallExpression node
 type CallExpression struct {
 	Token     token.Token // The '(' token
@@ -304,6 +341,9 @@ func (ce *CallExpression) String() string {
 	return out.String()
 }
 
+// Line return line number
+func (ce *CallExpression) Line() int { return ce.Token.Line }
+
 // StringLiteral node
 type StringLiteral struct {
 	Token token.Token
@@ -315,6 +355,9 @@ func (sl *StringLiteral) expressionNode() {}
 // TokenLiteral return literal for string
 func (sl *StringLiteral) TokenLiteral() string { return sl.Token.Literal }
 func (sl *StringLiteral) String() string       { return sl.Token.Literal }
+
+// Line return line number
+func (sl *StringLiteral) Line() int { return sl.Token.Line }
 
 // ArrayLiteral node
 type ArrayLiteral struct {
@@ -341,6 +384,9 @@ func (al *ArrayLiteral) String() string {
 	return out.String()
 }
 
+// Line return line number
+func (al *ArrayLiteral) Line() int { return al.Token.Line }
+
 // IndexExpression node
 type IndexExpression struct {
 	Token token.Token // the [ token
@@ -363,6 +409,9 @@ func (ie *IndexExpression) String() string {
 
 	return out.String()
 }
+
+// Line return line number
+func (ie *IndexExpression) Line() int { return ie.Token.Line }
 
 // HashLiteral node
 type HashLiteral struct {
@@ -388,3 +437,6 @@ func (hl *HashLiteral) String() string {
 
 	return out.String()
 }
+
+// Line return line number
+func (hl *HashLiteral) Line() int { return hl.Token.Line }
