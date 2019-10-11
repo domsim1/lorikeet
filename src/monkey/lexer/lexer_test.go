@@ -31,6 +31,8 @@ func TestNextToken(t *testing.T) {
 		 "foo bar"
 		 [1, 2];
 		 {"foo": "bar"}
+		 let 汉字 = "かんじ";
+		 "🐵 🙈 🙉 🙊 🐒"
 		`
 
 	tests := []struct {
@@ -123,6 +125,12 @@ func TestNextToken(t *testing.T) {
 		{token.COLON, ":"},
 		{token.STRING, "bar"},
 		{token.RBRACE, "}"},
+		{token.LET, "let"},
+		{token.IDENT, "汉字"},
+		{token.ASSIGN, "="},
+		{token.STRING, "かんじ"},
+		{token.SEMICOLON, ";"},
+		{token.STRING, "🐵 🙈 🙉 🙊 🐒"},
 		{token.EOF, ""},
 	}
 

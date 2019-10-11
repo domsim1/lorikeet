@@ -1,19 +1,22 @@
 package lexer
 
-import "monkey/token"
+import (
+	"monkey/token"
+	"unicode"
+)
 
 // Lexer struct
 type Lexer struct {
-	input        string
+	input        []rune
 	position     int
-	readPosition int  // TODO: Track line number
-	ch           byte // TODO: suport Unicode (rune)
+	readPosition int // TODO: Track line number
+	ru           rune
 }
 
 // New *Lexer
 func New(input string) *Lexer {
-	l := &Lexer{input: input}
-	l.readChar()
+	l := &Lexer{input: []rune(input)}
+	l.readRune()
 	return l
 }
 
@@ -23,55 +26,55 @@ func (l *Lexer) NextToken() token.Token {
 
 	l.skipWhitespace()
 
-	switch l.ch {
+	switch l.ru {
 	case '=':
-		if l.peekChar() == '=' {
-			ch := l.ch
-			l.readChar()
-			literal := string(ch) + string(l.ch)
+		if l.peekRune() == '=' {
+			ch := l.ru
+			l.readRune()
+			literal := string(ch) + string(l.ru)
 			tok = token.Token{Type: token.EQ, Literal: literal}
 		} else {
-			tok = newToken(token.ASSIGN, l.ch)
+			tok = newToken(token.ASSIGN, l.ru)
 		}
 	case ';':
-		tok = newToken(token.SEMICOLON, l.ch)
+		tok = newToken(token.SEMICOLON, l.ru)
 	case '(':
-		tok = newToken(token.LPAREN, l.ch)
+		tok = newToken(token.LPAREN, l.ru)
 	case ')':
-		tok = newToken(token.RPAREN, l.ch)
+		tok = newToken(token.RPAREN, l.ru)
 	case ',':
-		tok = newToken(token.COMMA, l.ch)
+		tok = newToken(token.COMMA, l.ru)
 	case ':':
-		tok = newToken(token.COLON, l.ch)
+		tok = newToken(token.COLON, l.ru)
 	case '+':
-		tok = newToken(token.PLUS, l.ch)
+		tok = newToken(token.PLUS, l.ru)
 	case '-':
-		tok = newToken(token.MINUS, l.ch)
+		tok = newToken(token.MINUS, l.ru)
 	case '{':
-		tok = newToken(token.LBRACE, l.ch)
+		tok = newToken(token.LBRACE, l.ru)
 	case '}':
-		tok = newToken(token.RBRACE, l.ch)
+		tok = newToken(token.RBRACE, l.ru)
 	case '[':
-		tok = newToken(token.LBRACKET, l.ch)
+		tok = newToken(token.LBRACKET, l.ru)
 	case ']':
-		tok = newToken(token.RBRACKET, l.ch)
+		tok = newToken(token.RBRACKET, l.ru)
 	case '!':
-		if l.peekChar() == '=' {
-			ch := l.ch
-			l.readChar()
-			literal := string(ch) + string(l.ch)
+		if l.peekRune() == '=' {
+			ch := l.ru
+			l.readRune()
+			literal := string(ch) + string(l.ru)
 			tok = token.Token{Type: token.NOTEQ, Literal: literal}
 		} else {
-			tok = newToken(token.BANG, l.ch)
+			tok = newToken(token.BANG, l.ru)
 		}
 	case '*':
-		tok = newToken(token.ASTERISK, l.ch)
+		tok = newToken(token.ASTERISK, l.ru)
 	case '/':
-		tok = newToken(token.SLASH, l.ch)
+		tok = newToken(token.SLASH, l.ru)
 	case '<':
-		tok = newToken(token.LT, l.ch)
+		tok = newToken(token.LT, l.ru)
 	case '>':
-		tok = newToken(token.GT, l.ch)
+		tok = newToken(token.GT, l.ru)
 	case '"':
 		tok.Type = token.STRING
 		tok.Literal = l.readString()
@@ -79,55 +82,55 @@ func (l *Lexer) NextToken() token.Token {
 		tok.Literal = ""
 		tok.Type = token.EOF
 	default:
-		if isLetter(l.ch) {
+		if isLetter(l.ru) {
 			tok.Literal = l.readIdentifier()
 			tok.Type = token.LookupIdent(tok.Literal)
 			return tok
-		} else if isDigit(l.ch) {
+		} else if isDigit(l.ru) {
 			tok.Type = token.INT
 			tok.Literal = l.readNumber()
 			return tok
 		}
-		tok = newToken(token.ILLEGAL, l.ch)
+		tok = newToken(token.ILLEGAL, l.ru)
 	}
 
-	l.readChar()
+	l.readRune()
 	return tok
 }
 
 func (l *Lexer) readIdentifier() string {
 	position := l.position
-	for isLetter(l.ch) {
-		l.readChar()
+	for isLetter(l.ru) {
+		l.readRune()
 	}
-	return l.input[position:l.position]
+	return string(l.input[position:l.position])
 }
 
-func (l *Lexer) readChar() {
+func (l *Lexer) readRune() {
 	if l.readPosition >= len(l.input) {
-		l.ch = 0
+		l.ru = 0
 	} else {
-		l.ch = l.input[l.readPosition]
+		l.ru = l.input[l.readPosition]
 	}
 	l.position = l.readPosition
 	l.readPosition++
 }
 
 func (l *Lexer) skipWhitespace() {
-	for l.ch == ' ' || l.ch == '\t' || l.ch == '\n' || l.ch == '\r' {
-		l.readChar()
+	for l.ru == ' ' || l.ru == '\t' || l.ru == '\n' || l.ru == '\r' {
+		l.readRune()
 	}
 }
 
 func (l *Lexer) readNumber() string {
 	position := l.position
-	for isDigit(l.ch) {
-		l.readChar()
+	for isDigit(l.ru) {
+		l.readRune()
 	}
-	return l.input[position:l.position]
+	return string(l.input[position:l.position])
 }
 
-func (l *Lexer) peekChar() byte {
+func (l *Lexer) peekRune() rune {
 	if l.readPosition >= len(l.input) {
 		return 0
 	}
@@ -137,23 +140,23 @@ func (l *Lexer) peekChar() byte {
 func (l *Lexer) readString() string {
 	position := l.position + 1
 	for {
-		l.readChar()
-		if l.ch == '"' || l.ch == 0 {
+		l.readRune()
+		if l.ru == '"' || l.ru == 0 {
 			break
 		}
 	}
-	return l.input[position:l.position]
+	return string(l.input[position:l.position])
 }
 
 // Allowed identifier chars
-func isLetter(ch byte) bool {
-	return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_'
+func isLetter(ru rune) bool {
+	return ru == '_' || unicode.IsLetter(ru)
 }
 
-func newToken(tokenType token.Type, ch byte) token.Token {
-	return token.Token{Type: tokenType, Literal: string(ch)}
+func newToken(tokenType token.Type, ru rune) token.Token {
+	return token.Token{Type: tokenType, Literal: string(ru)}
 }
 
-func isDigit(ch byte) bool {
-	return '0' <= ch && ch <= '9'
+func isDigit(ru rune) bool {
+	return '0' <= ru && ru <= '9'
 }
