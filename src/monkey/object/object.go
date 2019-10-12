@@ -23,6 +23,7 @@ const (
 	BUILTIN  = "BUILTIN"
 	ARRAY    = "ARRAY"
 	HASH     = "HASH"
+	QUOTE    = "QUOTE"
 )
 
 // Object methods
@@ -228,4 +229,17 @@ func (h *Hash) Inspect() string {
 // Hashable provides HashKey function to HashKey object
 type Hashable interface {
 	HashKey() HashKey
+}
+
+// Quote object
+type Quote struct {
+	Node ast.Node
+}
+
+// Type will return qoute type "QUOTE"
+func (q *Quote) Type() Type { return QUOTE }
+
+// Inspect will return quote value
+func (q *Quote) Inspect() string {
+	return "QUOTE(" + q.Node.String() + ")"
 }
