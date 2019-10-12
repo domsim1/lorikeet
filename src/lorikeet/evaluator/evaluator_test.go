@@ -1,9 +1,9 @@
 package evaluator
 
 import (
-	"monkey/lexer"
-	"monkey/object"
-	"monkey/parser"
+	"lorikeet/lexer"
+	"lorikeet/object"
+	"lorikeet/parser"
 	"testing"
 )
 
@@ -214,7 +214,7 @@ if (10 > 1) {
 			"identifier not found: foobar; line=1",
 		},
 		{
-			`{"name": "Monkey"}[fn(x) { x }];`,
+			`{"name": "Lorikeet"}[fn(x) { x }];`,
 			"unusable as hash key: FUNCTION; line=1",
 		},
 		{

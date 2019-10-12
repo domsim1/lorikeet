@@ -3,7 +3,7 @@ package lexer
 import (
 	"testing"
 
-	"monkey/token"
+	"lorikeet/token"
 )
 
 func TestNextToken(t *testing.T) {
@@ -33,6 +33,7 @@ func TestNextToken(t *testing.T) {
 		 {"foo": "bar"}
 		 let 汉字 = "かんじ";
 		 "🐵 🙈 🙉 🙊 🐒"
+		 macro(x, y) { x + y; };
 		`
 
 	tests := []struct {
@@ -132,7 +133,20 @@ func TestNextToken(t *testing.T) {
 		{token.STRING, "かんじ", 24},
 		{token.SEMICOLON, ";", 24},
 		{token.STRING, "🐵 🙈 🙉 🙊 🐒", 25},
-		{token.EOF, "", 26},
+		{token.MACRO, "macro", 26},
+		{token.LPAREN, "(", 26},
+		{token.IDENT, "x", 26},
+		{token.COMMA, ",", 26},
+		{token.IDENT, "y", 26},
+		{token.RPAREN, ")", 26},
+		{token.LBRACE, "{", 26},
+		{token.IDENT, "x", 26},
+		{token.PLUS, "+", 26},
+		{token.IDENT, "y", 26},
+		{token.SEMICOLON, ";", 26},
+		{token.RBRACE, "}", 26},
+		{token.SEMICOLON, ";", 26},
+		{token.EOF, "", 27},
 	}
 
 	l := New(input)

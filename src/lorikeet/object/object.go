@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"hash/fnv"
-	"monkey/ast"
+	"lorikeet/ast"
 	"strings"
 )
 
@@ -24,6 +24,7 @@ const (
 	ARRAY    = "ARRAY"
 	HASH     = "HASH"
 	QUOTE    = "QUOTE"
+	MACRO    = "MACRO"
 )
 
 // Object methods
@@ -56,7 +57,7 @@ func (f *Function) Inspect() string {
 	out.WriteString(strings.Join(params, ","))
 	out.WriteString(") {\n")
 	out.WriteString(f.Body.String())
-	out.WriteString("\n}\n")
+	out.WriteString("\n}")
 
 	return out.String()
 }
@@ -242,4 +243,33 @@ func (q *Quote) Type() Type { return QUOTE }
 // Inspect will return quote value
 func (q *Quote) Inspect() string {
 	return "QUOTE(" + q.Node.String() + ")"
+}
+
+// Macro object
+type Macro struct {
+	Parameters []*ast.Identifier
+	Body       *ast.BlockStatement
+	Env        *Environment
+}
+
+// Type will return macro type "MACRO"
+func (m *Macro) Type() Type { return MACRO }
+
+// Inspect will return macro value
+func (m *Macro) Inspect() string {
+	var out bytes.Buffer
+
+	params := []string{}
+	for _, p := range m.Parameters {
+		params = append(params, p.String())
+	}
+
+	out.WriteString("macro")
+	out.WriteString("(")
+	out.WriteString(strings.Join(params, ", "))
+	out.WriteString(") {\n")
+	out.WriteString(m.Body.String())
+	out.WriteString("\n}")
+
+	return out.String()
 }

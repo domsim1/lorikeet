@@ -2,7 +2,7 @@ package ast
 
 import (
 	"bytes"
-	"monkey/token"
+	"lorikeet/token"
 	"strings"
 )
 
@@ -440,3 +440,34 @@ func (hl *HashLiteral) String() string {
 
 // Line return line number
 func (hl *HashLiteral) Line() int { return hl.Token.Line }
+
+// MacroLiteral node
+type MacroLiteral struct {
+	Token      token.Token // The 'macro' token
+	Parameters []*Identifier
+	Body       *BlockStatement
+}
+
+func (ml *MacroLiteral) expressionNode() {}
+
+// TokenLiteral return literal for macro
+func (ml *MacroLiteral) TokenLiteral() string { return ml.Token.Literal }
+func (ml *MacroLiteral) String() string {
+	var out bytes.Buffer
+
+	params := []string{}
+	for _, p := range ml.Parameters {
+		params = append(params, p.String())
+	}
+
+	out.WriteString(ml.TokenLiteral())
+	out.WriteString("(")
+	out.WriteString(strings.Join(params, ", "))
+	out.WriteString(") ")
+	out.WriteString(ml.Body.String())
+
+	return out.String()
+}
+
+// Line return line number
+func (ml *MacroLiteral) Line() int { return ml.Token.Line }
