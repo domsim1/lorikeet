@@ -2,8 +2,8 @@ package evaluator
 
 import (
 	"fmt"
-	"monkey/ast"
-	"monkey/object"
+	"lorikeet/ast"
+	"lorikeet/object"
 )
 
 // Boolean
@@ -83,6 +83,9 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return &object.Function{Parameters: params, Env: env, Body: body}
 
 	case *ast.CallExpression:
+		if node.Function.TokenLiteral() == "quote" {
+			return quote(node.Arguments[0], env)
+		}
 		function := Eval(node.Function, env)
 		if isError(function) {
 			return function
@@ -118,6 +121,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 
 	case *ast.HashLiteral:
 		return evalHashLiteral(node, env)
+
 	}
 
 	return nil

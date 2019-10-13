@@ -1,9 +1,9 @@
 package evaluator
 
 import (
-	"monkey/lexer"
-	"monkey/object"
-	"monkey/parser"
+	"lorikeet/lexer"
+	"lorikeet/object"
+	"lorikeet/parser"
 	"testing"
 )
 
@@ -167,35 +167,35 @@ func TestErrorHandling(t *testing.T) {
 	}{
 		{
 			"5 + true;",
-			"type mismatch: INTEGER + BOOLEAN",
+			"type mismatch: INTEGER + BOOLEAN; line=1",
 		},
 		{
 			"5 + true; 5;",
-			"type mismatch: INTEGER + BOOLEAN",
+			"type mismatch: INTEGER + BOOLEAN; line=1",
 		},
 		{
 			"-true",
-			"unknown operator: -BOOLEAN",
+			"unknown operator: -BOOLEAN; line=1",
 		},
 		{
 			"true + false;",
-			"unknown operator: BOOLEAN + BOOLEAN",
+			"unknown operator: BOOLEAN + BOOLEAN; line=1",
 		},
 		{
 			"true + false + true + false;",
-			"unknown operator: BOOLEAN + BOOLEAN",
+			"unknown operator: BOOLEAN + BOOLEAN; line=1",
 		},
 		{
 			"5; true + false; 5",
-			"unknown operator: BOOLEAN + BOOLEAN",
+			"unknown operator: BOOLEAN + BOOLEAN; line=1",
 		},
 		{
 			`"Hello" - "World"`,
-			"unknown operator: STRING - STRING",
+			"unknown operator: STRING - STRING; line=1",
 		},
 		{
 			"if (10 > 1) { true + false; }",
-			"unknown operator: BOOLEAN + BOOLEAN",
+			"unknown operator: BOOLEAN + BOOLEAN; line=1",
 		},
 		{
 			`
@@ -207,19 +207,19 @@ if (10 > 1) {
   return 1;
 }
 `,
-			"unknown operator: BOOLEAN + BOOLEAN",
+			"unknown operator: BOOLEAN + BOOLEAN; line=4",
 		},
 		{
 			"foobar",
-			"identifier not found: foobar",
+			"identifier not found: foobar; line=1",
 		},
 		{
-			`{"name": "Monkey"}[fn(x) { x }];`,
-			"unusable as hash key: FUNCTION",
+			`{"name": "Lorikeet"}[fn(x) { x }];`,
+			"unusable as hash key: FUNCTION; line=1",
 		},
 		{
 			`999[1]`,
-			"index operator not supported: INTEGER",
+			"index operator not supported: INTEGER; line=1",
 		},
 	}
 
