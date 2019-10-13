@@ -2,6 +2,7 @@ package repl
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"io"
 	"lorikeet/evaluator"
@@ -16,6 +17,7 @@ const PROMPT = ">> "
 // Start the REPL
 func Start(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
+	scanner.Split(scanLinesEscapable)
 	env := object.NewEnvironment()
 	macroEnv := object.NewEnvironment()
 
@@ -52,4 +54,55 @@ func printParserErrors(out io.Writer, errors []string) {
 	for _, msg := range errors {
 		io.WriteString(out, "\t"+msg+"\n")
 	}
+}
+
+func scanLinesEscapable(data []byte, atEOF bool) (advance int, token []byte, err error) {
+	if atEOF && len(data) == 0 {
+		return 0, nil, nil
+	}
+
+	if i := bytes.LastIndexByte(data, '\n'); i >= 0 {
+		if wasNewLineEscaped(data[0:i]) {
+			// new line was escaped, request more data
+			return 0, nil, nil
+		}
+		// We have a full newline-terminated line.
+		return i + 1, dropCRBS(data[0:i]), nil
+	}
+	// If we're at EOF, we have a final, non-terminated line. Return it.
+	if atEOF {
+		return len(data), dropCRBS(data), nil
+	}
+	// Request more data.
+	return 0, nil, nil
+}
+
+// drop all /r and //
+func dropCRBS(data []byte) []byte {
+	if len(data) > 0 {
+		return bytes.ReplaceAll(
+			bytes.ReplaceAll(data, []byte("\r"), []byte("")),
+			[]byte("\\\n"),
+			[]byte("\n"))
+	}
+	return data
+}
+
+func wasNewLineEscaped(data []byte) bool {
+	if len(data) > 0 {
+		if data[len(data)-1] == '\r' {
+			return wasNewLineEscaped(dropCR(data))
+		}
+		if data[len(data)-1] == '\\' {
+			return true
+		}
+	}
+	return false
+}
+
+func dropCR(data []byte) []byte {
+	if len(data) > 0 && data[len(data)-1] == '\r' {
+		return data[0 : len(data)-1]
+	}
+	return data
 }
