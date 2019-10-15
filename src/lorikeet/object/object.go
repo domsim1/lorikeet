@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"hash/fnv"
 	"lorikeet/ast"
+	"lorikeet/code"
 	"strings"
 )
 
@@ -13,18 +14,20 @@ type Type string
 
 // Types
 const (
-	INTEGER  = "INTEGER"
-	BOOLEAN  = "BOOLEAN"
-	NULL     = "NULL"
-	RETURN   = "RETURN_VALUE"
-	ERROR    = "ERROR"
-	FUNCTION = "FUNCTION"
-	STRING   = "STRING"
-	BUILTIN  = "BUILTIN"
-	ARRAY    = "ARRAY"
-	HASH     = "HASH"
-	QUOTE    = "QUOTE"
-	MACRO    = "MACRO"
+	INTEGER   = "INTEGER"
+	BOOLEAN   = "BOOLEAN"
+	NULL      = "NULL"
+	RETURN    = "RETURN_VALUE"
+	ERROR     = "ERROR"
+	FUNCTION  = "FUNCTION"
+	STRING    = "STRING"
+	BUILTIN   = "BUILTIN"
+	ARRAY     = "ARRAY"
+	HASH      = "HASH"
+	QUOTE     = "QUOTE"
+	MACRO     = "MACRO"
+	CFUNCTION = "COMPILED_FUNCTION"
+	CLOSURE   = "CLOSURE"
 )
 
 // Object methods
@@ -272,4 +275,33 @@ func (m *Macro) Inspect() string {
 	out.WriteString("\n}")
 
 	return out.String()
+}
+
+// CompiledFunction object
+type CompiledFunction struct {
+	Instructions  code.Instructions
+	NumLocals     int
+	NumParameters int
+}
+
+// Type will return compiled function type "COMPILED_FUNCTION"
+func (cf *CompiledFunction) Type() Type { return CFUNCTION }
+
+// Inspect will return compiled function value
+func (cf *CompiledFunction) Inspect() string {
+	return fmt.Sprintf("CompiledFunction[%p]", cf)
+}
+
+// Closure object
+type Closure struct {
+	Fn   *CompiledFunction
+	Free []Object
+}
+
+// Type will return closure type "CLOSURE"
+func (c *Closure) Type() Type { return CLOSURE }
+
+// Inspect will retun closure value
+func (c *Closure) Inspect() string {
+	return fmt.Sprintf("Closure[%p]", c)
 }
