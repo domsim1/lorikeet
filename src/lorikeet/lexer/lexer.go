@@ -59,6 +59,15 @@ func (l *Lexer) NextToken() token.Token {
 		tok = newToken(token.LBRACKET, l.ru, l.linePosition)
 	case ']':
 		tok = newToken(token.RBRACKET, l.ru, l.linePosition)
+	case '|':
+		if l.peekRune() == '>' {
+			ch := l.ru
+			l.readRune()
+			literal := string(ch) + string(l.ru)
+			tok = token.Token{Type: token.PIPE, Literal: literal, Line: l.linePosition}
+		} else {
+			tok = newToken(token.ILLEGAL, l.ru, l.linePosition)
+		}
 	case '!':
 		if l.peekRune() == '=' {
 			ch := l.ru

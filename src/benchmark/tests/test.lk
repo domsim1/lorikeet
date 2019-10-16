@@ -1,1 +1,9 @@
-say("hello!");
+let test = fn() {
+  "dom"
+}
+
+let sayTest = fn(y, x) {
+  say(y + " " + x);
+}
+
+test()|>sayTest("hello");

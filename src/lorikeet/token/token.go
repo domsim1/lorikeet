@@ -33,6 +33,8 @@ const (
 	EQ    = "=="
 	NOTEQ = "!="
 
+	PIPE = "|>"
+
 	MONEY = "$"
 
 	// Delimiters

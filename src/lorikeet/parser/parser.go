@@ -17,6 +17,7 @@ const (
 	SUM         // +
 	PRODUCT     // *
 	PREFIX      // -X or !X
+	PIPE        // |>
 	CALL        // myFunction(X)
 	INDEX       // array[index]
 )
@@ -30,6 +31,7 @@ var precedences = map[token.Type]int{
 	token.MINUS:    SUM,
 	token.SLASH:    PRODUCT,
 	token.ASTERISK: PRODUCT,
+	token.PIPE:     PIPE,
 	token.LPAREN:   CALL,
 	token.LBRACKET: INDEX,
 }
@@ -83,6 +85,8 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.NOTEQ, p.parseInfixExpression)
 	p.registerInfix(token.LT, p.parseInfixExpression)
 	p.registerInfix(token.GT, p.parseInfixExpression)
+
+	p.registerInfix(token.PIPE, p.parsePipeExpression)
 
 	p.registerInfix(token.LPAREN, p.parseCallExpression)
 
@@ -298,6 +302,21 @@ func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
 	expression.Right = p.parseExpression(precedence)
 
 	return expression
+}
+
+func (p *Parser) parsePipeExpression(exp ast.Expression) ast.Expression {
+	precedence := p.curPrecedence()
+	p.nextToken()
+	right := p.parseExpression(precedence)
+
+	cl, ok := right.(*ast.CallExpression)
+	if !ok {
+		return nil
+	}
+
+	cl.Arguments = append(cl.Arguments, exp)
+
+	return cl
 }
 
 func (p *Parser) parseBoolean() ast.Expression {
