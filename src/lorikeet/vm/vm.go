@@ -250,6 +250,14 @@ func (vm *VM) Run() error {
 				return err
 			}
 
+		case code.OpLazyCall:
+			numArgs := code.ReadUint8(ins[ip+1:])
+
+			err := vm.executeLazyCall(int(numArgs))
+			if err != nil {
+				return err
+			}
+
 		case code.OpReturnValue:
 			returnValue := vm.pop()
 
@@ -406,6 +414,33 @@ func nativeBoolToBooleanObject(input bool) *object.Boolean {
 		return True
 	}
 	return False
+}
+
+func (vm *VM) executeLazyCall(numArgs int) error {
+	clargs := vm.stack[vm.sp-1-numArgs : vm.sp]
+	// Clean stack and remove old frame
+	oldFrame := vm.popFrame()
+	vm.sp = oldFrame.basePointer - 1
+
+	for _, obj := range clargs {
+		vm.push(obj)
+	}
+
+	cl, ok := vm.stack[vm.sp-1-numArgs].(*object.Closure)
+	if !ok {
+		return fmt.Errorf("lazy can only be used on closures")
+	}
+	if numArgs != cl.Fn.NumParameters {
+		return fmt.Errorf("wrong number of arguments: want=%d, got=%d",
+			cl.Fn.NumParameters, numArgs)
+	}
+
+	frame := NewFrame(cl, vm.sp-numArgs)
+	vm.pushFrame(frame)
+
+	vm.sp = frame.basePointer + cl.Fn.NumLocals
+
+	return nil
 }
 
 func (vm *VM) executeBangOperator() error {

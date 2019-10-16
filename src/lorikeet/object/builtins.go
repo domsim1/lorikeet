@@ -28,7 +28,7 @@ var Builtins = []struct {
 		},
 	},
 	{
-		"puts",
+		"say",
 		&Builtin{Fn: func(args ...Object) Object {
 			for _, arg := range args {
 				fmt.Println(arg.Inspect())
@@ -39,14 +39,14 @@ var Builtins = []struct {
 		},
 	},
 	{
-		"first",
+		"head",
 		&Builtin{Fn: func(args ...Object) Object {
 			if len(args) != 1 {
 				return newError("wrong number of arguments. got=%d, want=1",
 					len(args))
 			}
 			if args[0].Type() != ARRAY {
-				return newError("argument to `first` must be ARRAY, got %s",
+				return newError("argument to `head` must be ARRAY, got %s",
 					args[0].Type())
 			}
 
@@ -82,14 +82,14 @@ var Builtins = []struct {
 		},
 	},
 	{
-		"rest",
+		"tail",
 		&Builtin{Fn: func(args ...Object) Object {
 			if len(args) != 1 {
 				return newError("wrong number of arguments. got=%d, want=1",
 					len(args))
 			}
 			if args[0].Type() != ARRAY {
-				return newError("argument to `rest` must be ARRAY, got %s",
+				return newError("argument to `tail` must be ARRAY, got %s",
 					args[0].Type())
 			}
 

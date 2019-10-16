@@ -44,6 +44,7 @@ const (
 	OpClosure
 	OpGetFree
 	OpCurrentClosure
+	OpLazyCall
 )
 
 // Definition of an opcode had two fields.
@@ -86,6 +87,7 @@ var definitions = map[Opcode]*Definition{
 	OpClosure:        {"OpClosure", []int{2, 1}},
 	OpGetFree:        {"OpGetFree", []int{1}},
 	OpCurrentClosure: {"OpCurrentClosure", []int{}},
+	OpLazyCall:       {"OpCall", []int{1}},
 }
 
 // Lookup gets opcode definition by id

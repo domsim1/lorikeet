@@ -6,9 +6,9 @@ import (
 
 var builtins = map[string]*object.Builtin{
 	"len":   object.GetBuiltinByName("len"),
-	"puts":  object.GetBuiltinByName("puts"),
-	"first": object.GetBuiltinByName("first"),
+	"say":  object.GetBuiltinByName("say"),
+	"head": object.GetBuiltinByName("head"),
 	"last":  object.GetBuiltinByName("last"),
-	"rest":  object.GetBuiltinByName("rest"),
+	"tail":  object.GetBuiltinByName("tail"),
 	"push":  object.GetBuiltinByName("push"),
 }

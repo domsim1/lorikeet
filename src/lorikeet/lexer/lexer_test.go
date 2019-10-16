@@ -34,6 +34,7 @@ func TestNextToken(t *testing.T) {
 		 let 汉字 = "かんじ";
 		 "🐵 🙈 🙉 🙊 🐒"
 		 macro(x, y) { x + y; };
+		 $do();
 		`
 
 	tests := []struct {
@@ -146,7 +147,12 @@ func TestNextToken(t *testing.T) {
 		{token.SEMICOLON, ";", 26},
 		{token.RBRACE, "}", 26},
 		{token.SEMICOLON, ";", 26},
-		{token.EOF, "", 27},
+		{token.MONEY, "$", 27},
+		{token.IDENT, "do", 27},
+		{token.LPAREN, "(", 27},
+		{token.RPAREN, ")", 27},
+		{token.SEMICOLON, ";", 27},
+		{token.EOF, "", 28},
 	}
 
 	l := New(input)

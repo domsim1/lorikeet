@@ -130,6 +130,27 @@ func (c *Compiler) Compile(node ast.Node) error {
 		}
 
 	case *ast.PrefixExpression:
+		switch node.Operator {
+		case "$":
+			call, ok := node.Right.(*ast.CallExpression)
+			if !ok {
+				return fmt.Errorf("unexpected operator after $")
+			}
+			err := c.Compile(call.Function)
+			if err != nil {
+				return err
+			}
+
+			for _, a := range call.Arguments {
+				err := c.Compile(a)
+				if err != nil {
+					return err
+				}
+			}
+
+			c.emit(code.OpLazyCall, len(call.Arguments))
+			return nil
+		}
 		err := c.Compile(node.Right)
 		if err != nil {
 			return err
