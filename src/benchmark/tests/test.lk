@@ -1,1 +1,10 @@
-say("hello!");
+let test = fn() {
+  10
+}
+
+let sayTest = fn(y, x) {
+  say(y);
+  say(x);
+}
+
+test()|>say("hello", $);

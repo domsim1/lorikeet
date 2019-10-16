@@ -35,6 +35,7 @@ func TestNextToken(t *testing.T) {
 		 "🐵 🙈 🙉 🙊 🐒"
 		 macro(x, y) { x + y; };
 		 $do();
+		 getName()|>greet("hello");
 		`
 
 	tests := []struct {
@@ -152,7 +153,16 @@ func TestNextToken(t *testing.T) {
 		{token.LPAREN, "(", 27},
 		{token.RPAREN, ")", 27},
 		{token.SEMICOLON, ";", 27},
-		{token.EOF, "", 28},
+		{token.IDENT, "getName", 28},
+		{token.LPAREN, "(", 28},
+		{token.RPAREN, ")", 28},
+		{token.PIPE, "|>", 28},
+		{token.IDENT, "greet", 28},
+		{token.LPAREN, "(", 28},
+		{token.STRING, "hello", 28},
+		{token.RPAREN, ")", 28},
+		{token.SEMICOLON, ";", 28},
+		{token.EOF, "", 29},
 	}
 
 	l := New(input)
