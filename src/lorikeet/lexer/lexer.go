@@ -76,6 +76,8 @@ func (l *Lexer) NextToken() token.Token {
 		tok = newToken(token.LT, l.ru, l.linePosition)
 	case '>':
 		tok = newToken(token.GT, l.ru, l.linePosition)
+	case '$':
+		tok = newToken(token.MONEY, l.ru, l.linePosition)
 	case '"':
 		tok.Type = token.STRING
 		tok.Literal = l.readString()

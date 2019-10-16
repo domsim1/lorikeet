@@ -1,0 +1,8 @@
+let main = fn(x) {
+  if (x == 9223372036854775807) { return; }
+  say(x);
+  $main(x + 1);
+}
+main(0);
+
+say("done!");
