@@ -1,10 +1,9 @@
 let test = fn() {
-  10
+  "dom"
 }
 
 let sayTest = fn(y, x) {
-  say(y);
-  say(x);
+  say(y + " " + x);
 }
 
-test()|>say("hello", $);
+test()|>sayTest("hello");

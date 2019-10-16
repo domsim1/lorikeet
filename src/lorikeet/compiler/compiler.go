@@ -345,16 +345,6 @@ func (c *Compiler) Compile(node ast.Node) error {
 
 		c.emit(code.OpCall, len(node.Arguments))
 
-	case *ast.PipeExpression:
-		err := c.Compile(node.Left)
-		if err != nill {
-			return err
-		}
-
-		c.emit(code.OpPipe)
-
-		funErr := 
-
 	}
 
 	return nil

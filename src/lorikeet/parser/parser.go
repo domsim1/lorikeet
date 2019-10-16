@@ -304,17 +304,19 @@ func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
 	return expression
 }
 
-func (p *Parser) parsePipeExpression(left ast.Expression) ast.Expression {
-	expression := &ast.PipeExpression{
-		Token:    p.curToken,
-		Left:     left,
-	}
-
+func (p *Parser) parsePipeExpression(exp ast.Expression) ast.Expression {
 	precedence := p.curPrecedence()
 	p.nextToken()
-	expression.Right = p.parseExpression(precedence)
+	right := p.parseExpression(precedence)
 
-	return expression
+	cl, ok := right.(*ast.CallExpression)
+	if !ok {
+		return nil
+	}
+
+	cl.Arguments = append(cl.Arguments, exp)
+
+	return cl
 }
 
 func (p *Parser) parseBoolean() ast.Expression {

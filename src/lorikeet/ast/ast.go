@@ -319,29 +319,6 @@ func (fl *FunctionLiteral) String() string {
 // Line return line number
 func (fl *FunctionLiteral) Line() int { return fl.Token.Line }
 
-// PipeExpression node
-type PipeExpression struct {
-	Token token.Token // the '|>' token
-	Left  Expression // Left call
-	Right Expression // Right call with $ arg
-}
-
-func (pe *PipeExpression) expressionNode() {}
-
-func (pe *PipeExpression) TokenLiteral() string { return pe.Token.Literal }
-func (pe *PipeExpression) String() string {
-	var out bytes.Buffer
-
-	out.WriteString(pe.Left.String());
-	out.WriteString("|>")
-	out.WriteString(pe.Right.String());
-
-	return out.String()
-}
-
-// Line return line number
-func (pe *PipeExpression) Line() int { return pe.Token.Line }
-
 // CallExpression node
 type CallExpression struct {
 	Token     token.Token // The '(' token

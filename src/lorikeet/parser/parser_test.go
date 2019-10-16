@@ -272,36 +272,6 @@ func TestParsingInfixExpressions(t *testing.T) {
 	}
 }
 
-func TestParsingPipeExpressions(t *testing.T) {
-	pipeTests := []struct {
-		input      string
-	}{
-		{`getName(x)|>greet("hello");`},
-	}
-
-	for _, tt := range pipeTests {
-		l := lexer.New(tt.input)
-		p := New(l)
-		program := p.ParseProgram()
-		checkParserErrors(t, p)
-
-		if len(program.Statements) != 1 {
-			t.Fatalf("program.Statements does not contain %d statements. got=%d\n",
-				1, len(program.Statements))
-		}
-
-		stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
-		if !ok {
-			t.Fatalf("program.Statements[0] is not ast.ExpressionStatement. got=%T",
-				program.Statements[0])
-		}
-
-		if !testPipeExpression(t, stmt.Expression) {
-			return
-		}
-	}
-}
-
 func TestOperatorPrecedenceParsing(t *testing.T) {
 	tests := []struct {
 		input    string
@@ -711,6 +681,16 @@ func TestCallExpressionParameterParsing(t *testing.T) {
 			expectedIdent: "add",
 			expectedArgs:  []string{"1", "(2 * 3)", "(4 + 5)"},
 		},
+		{
+			input:         "10 |> add(1);",
+			expectedIdent: "add",
+			expectedArgs:  []string{"1", "10"},
+		},
+		{
+			input:         "add(10, 2) |> add(1);",
+			expectedIdent: "add",
+			expectedArgs:  []string{"1", "add(10, 2)"},
+		},
 	}
 
 	for _, tt := range tests {
@@ -820,26 +800,6 @@ func testInfixExpression(t *testing.T, exp ast.Expression, left interface{},
 	}
 
 	if !testLiteralExpression(t, opExp.Right, right) {
-		return false
-	}
-
-	return true
-}
-
-func testPipeExpression(t *testing.T, exp ast.Expression) bool {
-	opExp, ok := exp.(*ast.PipeExpression)
-	if !ok {
-		t.Errorf("exp is not ast.InfixExpression. got=%T(%s)", exp, exp)
-		return false
-	}
-
-	_, okLeft := opExp.Left.(*ast.CallExpression)
-	if !okLeft {
-		return false
-	}
-
-	_, okRight := opExp.Right.(*ast.CallExpression)
-	if !okRight {
 		return false
 	}
 
