@@ -340,6 +340,8 @@ func (vm *VM) executeBinaryOperation(op code.Opcode) error {
 		return vm.executeBinaryIntegerOperation(op, left, right)
 	case leftType == object.STRING && rightType == object.STRING:
 		return vm.executeBinaryStringOperation(op, left, right)
+	case leftType == object.FLOAT && rightType == object.FLOAT:
+		return vm.executeBinaryFloatOperation(op, left, right)
 	default:
 		return fmt.Errorf("unsupported types for binary operation: %s %s",
 			leftType, rightType)
@@ -369,6 +371,31 @@ func (vm *VM) executeBinaryIntegerOperation(
 	}
 
 	return vm.push(&object.Integer{Value: result})
+}
+
+func (vm *VM) executeBinaryFloatOperation(
+	op code.Opcode,
+	left, right object.Object,
+) error {
+	leftValue := left.(*object.Float).Value
+	rightValue := right.(*object.Float).Value
+
+	var result float64
+
+	switch op {
+	case code.OpAdd:
+		result = leftValue + rightValue
+	case code.OpSub:
+		result = leftValue - rightValue
+	case code.OpMul:
+		result = leftValue * rightValue
+	case code.OpDiv:
+		result = leftValue / rightValue
+	default:
+		return fmt.Errorf("unknown float operator: %d", op)
+	}
+
+	return vm.push(&object.Float{Value: result})
 }
 
 func (vm *VM) executeComparison(op code.Opcode) error {
@@ -461,12 +488,17 @@ func (vm *VM) executeBangOperator() error {
 func (vm *VM) executeMinusOperator() error {
 	operand := vm.pop()
 
-	if operand.Type() != object.INTEGER {
-		return fmt.Errorf("unsupported type for negation: %s", operand.Type())
+	if operand.Type() == object.INTEGER {
+		value := operand.(*object.Integer).Value
+		return vm.push(&object.Integer{Value: -value})
 	}
 
-	value := operand.(*object.Integer).Value
-	return vm.push(&object.Integer{Value: -value})
+	if operand.Type() == object.FLOAT {
+		value := operand.(*object.Float).Value
+		return vm.push(&object.Float{Value: -value})
+	}
+
+	return fmt.Errorf("unsupported type for negation: %s", operand.Type())
 }
 
 func isTruthy(obj object.Object) bool {

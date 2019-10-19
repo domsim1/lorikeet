@@ -1,9 +1,3 @@
-let test = fn() {
-  "dom"
-}
+let num = 1.2;
 
-let sayTest = fn(y, x) {
-  say(y + " " + x);
-}
-
-test()|>sayTest("hello");
+say(num + 0.2);

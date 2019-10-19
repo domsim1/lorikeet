@@ -15,6 +15,7 @@ type Type string
 // Types
 const (
 	INTEGER   = "INTEGER"
+	FLOAT     = "FLOAT"
 	BOOLEAN   = "BOOLEAN"
 	NULL      = "NULL"
 	RETURN    = "RETURN_VALUE"
@@ -75,6 +76,17 @@ func (i *Integer) Type() Type { return INTEGER }
 
 // Inspect will return the Integer value
 func (i *Integer) Inspect() string { return fmt.Sprintf("%d", i.Value) }
+
+// Float object
+type Float struct {
+	Value float64
+}
+
+// Type will return the Float type "FLOAT"
+func (i *Float) Type() Type { return FLOAT }
+
+// Inspect will return the Float value
+func (i *Float) Inspect() string { return fmt.Sprintf("%g", i.Value) }
 
 // Boolean object
 type Boolean struct {

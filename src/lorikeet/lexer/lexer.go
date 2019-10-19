@@ -102,8 +102,7 @@ func (l *Lexer) NextToken() token.Token {
 			tok.Line = l.linePosition
 			return tok
 		} else if isDigit(l.ru) {
-			tok.Type = token.INT
-			tok.Literal = l.readNumber()
+			tok.Literal, tok.Type = l.readNumber()
 			tok.Line = l.linePosition
 			return tok
 		}
@@ -147,12 +146,20 @@ func (l *Lexer) skipWhitespace() {
 	}
 }
 
-func (l *Lexer) readNumber() string {
+func (l *Lexer) readNumber() (string, token.Type) {
 	position := l.position
 	for isDigit(l.ru) {
 		l.readRune()
 	}
-	return string(l.input[position:l.position])
+	if isDecimal(l.ru) {
+		l.readRune()
+		for isDigit(l.ru) {
+			l.readRune()
+		}
+		return string(l.input[position:l.position]), token.FLOAT
+	}
+	return string(l.input[position:l.position]), token.INT
+
 }
 
 func (l *Lexer) peekRune() rune {
@@ -184,4 +191,8 @@ func newToken(tokenType token.Type, ru rune, line int) token.Token {
 
 func isDigit(ru rune) bool {
 	return '0' <= ru && ru <= '9'
+}
+
+func isDecimal(ru rune) bool {
+	return '.' == ru
 }

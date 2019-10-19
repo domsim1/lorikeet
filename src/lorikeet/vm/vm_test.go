@@ -38,6 +38,29 @@ func TestIntegerArithmetic(t *testing.T) {
 	runVMTests(t, tests)
 }
 
+func TestFloatArithmetic(t *testing.T) {
+	tests := []vmTestCase{
+		{"1.3", 1.3},
+		{"2.0", 2.0},
+		{"1.1 + 2.2", 3.3},
+		{"1.1 - 2.2", -1.1},
+		{"1.1 * 2.2", 2.42},
+		{"4 / 2", 2},
+		{"50.5 / 2.3 * 2.2 + 10.1 - 5.0", 53.4043478261},
+		{"5.5 + 5.5 + 5.5 + 5.5 - 10.5", 11.5},
+		{"2.2 * 2.3 * 2.3 * 2.3 * 2.3", 61.56502},
+		{"5.4 * 2.3 + 10.0", 22.42},
+		{"5.2 + 2.1 * 10.8", 27.88},
+		{"5.2 * (2.1 + 10.0)", 62.92},
+		{"-5.1", -5.1},
+		{"-10.2", -10.2},
+		{"-50.2 + 100.1 + -50.5", -0.6},
+		{"(5.2 + 10.1 * 2.5 + 15.7 / 3.9) * 2.2 + -10.0", 65.8464102564},
+	}
+
+	runVMTests(t, tests)
+}
+
 func TestBooleanExpressions(t *testing.T) {
 	tests := []vmTestCase{
 		{"true", true},
@@ -390,6 +413,8 @@ func runVMTests(t *testing.T, tests []vmTestCase) {
 				fmt.Printf(" Instructions:\n%s", constant.Instructions)
 			case *object.Integer:
 				fmt.Printf(" Value: %d\n", constant.Value)
+			case *object.Float:
+				fmt.Printf(" Value: %g\n", constant.Value)
 			}
 
 			fmt.Printf("\n")

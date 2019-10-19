@@ -36,6 +36,7 @@ func TestNextToken(t *testing.T) {
 		 macro(x, y) { x + y; };
 		 $do();
 		 getName()|>greet("hello");
+		 1.5;
 		`
 
 	tests := []struct {
@@ -162,7 +163,9 @@ func TestNextToken(t *testing.T) {
 		{token.STRING, "hello", 28},
 		{token.RPAREN, ")", 28},
 		{token.SEMICOLON, ";", 28},
-		{token.EOF, "", 29},
+		{token.FLOAT, "1.5", 29},
+		{token.SEMICOLON, ";", 29},
+		{token.EOF, "", 30},
 	}
 
 	l := New(input)

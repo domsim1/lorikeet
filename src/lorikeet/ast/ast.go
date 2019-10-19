@@ -201,6 +201,21 @@ func (il *IntegerLiteral) String() string       { return il.Token.Literal }
 // Line return line number
 func (il *IntegerLiteral) Line() int { return il.Token.Line }
 
+// FloatLiteral node
+type FloatLiteral struct {
+	Token token.Token
+	Value float64
+}
+
+func (il *FloatLiteral) expressionNode() {}
+
+// TokenLiteral return literal for integer literal
+func (il *FloatLiteral) TokenLiteral() string { return il.Token.Literal }
+func (il *FloatLiteral) String() string       { return il.Token.Literal }
+
+// Line return line number
+func (il *FloatLiteral) Line() int { return il.Token.Line }
+
 // PrefixExpression node
 type PrefixExpression struct {
 	Token    token.Token // The prefix token, e.g. !
