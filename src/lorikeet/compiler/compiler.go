@@ -54,7 +54,7 @@ func New() *Compiler {
 	}
 }
 
-// Compile turnes code into target langauge
+// Compile turns code into target langauge
 func (c *Compiler) Compile(node ast.Node) error {
 	switch node := node.(type) {
 	case *ast.Program:

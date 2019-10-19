@@ -33,8 +33,8 @@ func main() {
 	program := p.ParseProgram()
 
 	comp := compiler.New()
-	compErr := comp.Compile(program)
-	if compErr != nil {
+	err = comp.Compile(program)
+	if err != nil {
 		fmt.Printf("compiler error: %s", err)
 		return
 	}
