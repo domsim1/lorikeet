@@ -1,7 +1,7 @@
 package object
 
 // NewEnclosedEnvironment creates *Enviroments enclosed to code blocks
-// this provides a scope for identifier created in functions
+// this provides a scope for identifiers created in functions
 func NewEnclosedEnvironment(outer *Environment) *Environment {
 	env := NewEnvironment()
 	env.outer = outer

@@ -19,6 +19,7 @@ const PROMPT = ">> "
 func Start(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
 	scanner.Split(scanLinesEscapable)
+	object.Scanner = scanner
 
 	constants := []object.Object{}
 	globals := make([]object.Object, vm.GlobalsSize)

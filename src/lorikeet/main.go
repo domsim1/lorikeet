@@ -1,11 +1,13 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"lorikeet/compiler"
 	"lorikeet/lexer"
+	"lorikeet/object"
 	"lorikeet/parser"
 	"lorikeet/repl"
 	"lorikeet/vm"
@@ -38,6 +40,8 @@ func main() {
 		fmt.Printf("compiler error: %s", err)
 		return
 	}
+
+	object.Scanner = bufio.NewScanner(os.Stdin)
 
 	machine := vm.New(comp.Bytecode())
 

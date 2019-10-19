@@ -1,6 +1,12 @@
 package object
 
-import "fmt"
+import (
+	"bufio"
+	"fmt"
+)
+
+// Scanner for get()
+var Scanner *bufio.Scanner
 
 // Builtins functions
 var Builtins = []struct {
@@ -35,6 +41,33 @@ var Builtins = []struct {
 			}
 
 			return nil
+		},
+		},
+	},
+	{
+		"ask",
+		&Builtin{Fn: func(args ...Object) Object {
+			if len(args) > 1 {
+				return newError("wrong number of arguments, no more than 1. got=%d",
+					len(args))
+			}
+
+			if len(args) == 1 {
+				if args[0].Type() != STRING {
+					return newError("argument to `say` must be STRING, got %s",
+						args[0].Type())
+				}
+
+				arr := args[0].(*String)
+				fmt.Print(arr.Inspect())
+			}
+
+			scanned := Scanner.Scan()
+			if !scanned {
+				return nil
+			}
+
+			return &String{Value: Scanner.Text()}
 		},
 		},
 	},
