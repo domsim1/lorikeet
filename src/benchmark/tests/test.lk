@@ -1,4 +1,0 @@
-let num = 1.2;
-
-let name = ask("What is your name? ");
-say("Hello " + name);

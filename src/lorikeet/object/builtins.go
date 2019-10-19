@@ -3,6 +3,7 @@ package object
 import (
 	"bufio"
 	"fmt"
+	"strconv"
 )
 
 // Scanner for get()
@@ -158,6 +159,84 @@ var Builtins = []struct {
 			newElements[length] = args[1]
 
 			return &Array{Elements: newElements}
+		},
+		},
+	},
+	{
+		"int",
+		&Builtin{Fn: func(args ...Object) Object {
+			if len(args) != 1 {
+				return newError("wrong number of arguments. got=%d, want=1",
+					len(args))
+			}
+
+			switch arg := args[0].(type) {
+			case *Float:
+				return &Integer{Value: int64(arg.Value)}
+			case *String:
+				val, err := strconv.ParseInt(arg.Value, 10, 64)
+				if err != nil {
+					flval, err := strconv.ParseFloat(arg.Value, 64)
+					if err != nil {
+						return nil
+					}
+					return &Integer{Value: int64(flval)}
+				}
+				return &Integer{Value: val}
+			case *Integer:
+				return arg
+			default:
+				return newError("argument to `int` not supported, got %s",
+					args[0].Type())
+			}
+		},
+		},
+	},
+	{
+		"float",
+		&Builtin{Fn: func(args ...Object) Object {
+			if len(args) != 1 {
+				return newError("wrong number of arguments. got=%d, want=1",
+					len(args))
+			}
+
+			switch arg := args[0].(type) {
+			case *Integer:
+				return &Float{Value: float64(arg.Value)}
+			case *String:
+				val, err := strconv.ParseFloat(arg.Value, 64)
+				if err != nil {
+					return nil
+				}
+				return &Float{Value: val}
+			case *Float:
+				return arg
+			default:
+				return newError("argument to `int` not supported, got %s",
+					args[0].Type())
+			}
+		},
+		},
+	},
+	{
+		"string",
+		&Builtin{Fn: func(args ...Object) Object {
+			if len(args) != 1 {
+				return newError("wrong number of arguments. got=%d, want=1",
+					len(args))
+			}
+
+			switch arg := args[0].(type) {
+			case *Float:
+				return &String{Value: fmt.Sprintf("%g", arg.Value)}
+			case *Integer:
+				return &String{Value: fmt.Sprintf("%d", arg.Value)}
+			case *String:
+				return arg
+			default:
+				return newError("argument to `int` not supported, got %s",
+					args[0].Type())
+			}
 		},
 		},
 	},

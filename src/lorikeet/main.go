@@ -17,8 +17,9 @@ import (
 var file string
 
 func main() {
-	flag.StringVar(&file, "file", "", "Usage")
+	flag.StringVar(&file, "file", "", "file path to execute")
 	flag.Parse()
+
 	if file == "" {
 		fmt.Printf("The Lorikeet programming language!\n")
 		repl.Start(os.Stdin, os.Stdout)
