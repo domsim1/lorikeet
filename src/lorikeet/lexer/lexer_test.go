@@ -37,6 +37,7 @@ func TestNextToken(t *testing.T) {
 		 $do();
 		 getName()|>greet("hello");
 		 1.5;
+		 fn test() {}
 		`
 
 	tests := []struct {
@@ -165,7 +166,13 @@ func TestNextToken(t *testing.T) {
 		{token.SEMICOLON, ";", 28},
 		{token.FLOAT, "1.5", 29},
 		{token.SEMICOLON, ";", 29},
-		{token.EOF, "", 30},
+		{token.FUNCTION, "fn", 30},
+		{token.IDENT, "test", 30},
+		{token.LPAREN, "(", 30},
+		{token.RPAREN, ")", 30},
+		{token.LBRACE, "{", 30},
+		{token.RBRACE, "}", 30},
+		{token.EOF, "", 31},
 	}
 
 	l := New(input)

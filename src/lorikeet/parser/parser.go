@@ -161,6 +161,8 @@ func (p *Parser) parseStatement() ast.Statement {
 		return p.parseLetStatement()
 	case token.RETURN:
 		return p.parseReturnStatement()
+	case token.FUNCTION:
+		return p.parseFunctionStatement()
 	default:
 		return p.parseExpressionStatement()
 	}
@@ -190,6 +192,35 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 	if p.peekTokenIs(token.SEMICOLON) {
 		p.nextToken()
 	}
+
+	return stmt
+}
+
+func (p *Parser) parseFunctionStatement() *ast.LetStatement {
+	lit := &ast.FunctionLiteral{Token: p.curToken}
+
+	stmt := &ast.LetStatement{Token: p.curToken}
+
+	if !p.expectPeek(token.IDENT) {
+		return nil
+	}
+
+	stmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+	lit.Name = stmt.Name.Value
+
+	if !p.expectPeek(token.LPAREN) {
+		return nil
+	}
+
+	lit.Parameters = p.parseFunctionParameters()
+
+	if !p.expectPeek(token.LBRACE) {
+		return nil
+	}
+
+	lit.Body = p.parseBlockStatement()
+
+	stmt.Value = lit
 
 	return stmt
 }
@@ -404,6 +435,14 @@ func (p *Parser) parseBlockStatement() *ast.BlockStatement {
 
 func (p *Parser) parseFunctionLiteral() ast.Expression {
 	lit := &ast.FunctionLiteral{Token: p.curToken}
+
+	if p.peekTokenIs(token.IDENT) {
+		p.nextToken()
+		msg := fmt.Sprintf("functions assigned to variables must be anonymus, name %s found; line=%d",
+			p.curToken.Literal, p.curToken.Line)
+		p.errors = append(p.errors, msg)
+		return nil
+	}
 
 	if !p.expectPeek(token.LPAREN) {
 		return nil
