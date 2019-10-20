@@ -34,6 +34,10 @@ func main() {
 	l := lexer.New(string(data))
 	p := parser.New(l)
 	program := p.ParseProgram()
+	if len(p.Errors()) != 0 {
+		repl.PrintParserErrors(os.Stdout, p.Errors())
+		return
+	}
 
 	comp := compiler.New()
 	err = comp.Compile(program)
