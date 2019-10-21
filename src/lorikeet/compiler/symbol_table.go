@@ -1,5 +1,7 @@
 package compiler
 
+import "fmt"
+
 // SymbolScope represents scope name
 type SymbolScope string
 
@@ -38,7 +40,7 @@ func NewSymbolTable() *SymbolTable {
 }
 
 // Define symbol in symbol table
-func (s *SymbolTable) Define(name string) Symbol {
+func (s *SymbolTable) Define(name string) (Symbol, error) {
 	symbol := Symbol{Name: name, Index: s.numDefinitions}
 	if s.Outer == nil {
 		symbol.Scope = GlobalScope
@@ -46,9 +48,17 @@ func (s *SymbolTable) Define(name string) Symbol {
 		symbol.Scope = LocalScope
 	}
 
+	obj, ok := s.Resolve(name)
+	if ok {
+		if symbol.Scope == obj.Scope {
+			return obj, fmt.Errorf("symbol %s has already been declared",
+				obj.Name)
+		}
+	}
+
 	s.store[name] = symbol
 	s.numDefinitions++
-	return symbol
+	return symbol, nil
 }
 
 // Resolve get symbol from symbol table

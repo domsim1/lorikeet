@@ -14,36 +14,54 @@ func TestDefine(t *testing.T) {
 
 	global := NewSymbolTable()
 
-	a := global.Define("a")
+	a, err := global.Define("a")
+	if err != nil {
+		t.Errorf("unexpected error: %s", err)
+	}
 	if a != expected["a"] {
 		t.Errorf("expected a=%+v, got=%+v", expected["a"], a)
 	}
 
-	b := global.Define("b")
+	b, err := global.Define("b")
+	if err != nil {
+		t.Errorf("unexpected error: %s", err)
+	}
 	if b != expected["b"] {
 		t.Errorf("expected b=%+v, got=%+v", expected["b"], b)
 	}
 
 	firstLocal := NewEnclosedSymbolTable(global)
 
-	c := firstLocal.Define("c")
+	c, err := firstLocal.Define("c")
+	if err != nil {
+		t.Errorf("unexpected error: %s", err)
+	}
 	if c != expected["c"] {
 		t.Errorf("expected c=%+v, got=%+v", expected["c"], c)
 	}
 
-	d := firstLocal.Define("d")
+	d, err := firstLocal.Define("d")
+	if err != nil {
+		t.Errorf("unexpected error: %s", err)
+	}
 	if d != expected["d"] {
 		t.Errorf("expected d=%+v, got=%+v", expected["d"], d)
 	}
 
 	secondLocal := NewEnclosedSymbolTable(firstLocal)
 
-	e := secondLocal.Define("e")
+	e, err := secondLocal.Define("e")
+	if err != nil {
+		t.Errorf("unexpected error: %s", err)
+	}
 	if e != expected["e"] {
 		t.Errorf("expected e=%+v, got=%+v", expected["e"], e)
 	}
 
-	f := secondLocal.Define("f")
+	f, err := secondLocal.Define("f")
+	if err != nil {
+		t.Errorf("unexpected error: %s", err)
+	}
 	if f != expected["f"] {
 		t.Errorf("expected f=%+v, got=%+v", expected["f"], f)
 	}

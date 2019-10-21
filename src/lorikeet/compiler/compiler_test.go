@@ -808,7 +808,7 @@ func TestBuiltins(t *testing.T) {
 				code.Make(code.OpArray, 0),
 				code.Make(code.OpCall, 1),
 				code.Make(code.OpPop),
-				code.Make(code.OpGetBuiltin, 5),
+				code.Make(code.OpGetBuiltin, 6),
 				code.Make(code.OpArray, 0),
 				code.Make(code.OpConstant, 0),
 				code.Make(code.OpCall, 2),

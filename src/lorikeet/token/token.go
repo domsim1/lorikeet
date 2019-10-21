@@ -55,6 +55,7 @@ const (
 	// Keywords
 	FUNCTION = "FUNCTION"
 	LET      = "LET"
+	MUTATE   = "MUTATE"
 	TRUE     = "TRUE"
 	FALSE    = "FALSE"
 	IF       = "IF"
@@ -66,6 +67,7 @@ const (
 var keywords = map[string]Type{
 	"fn":     FUNCTION,
 	"let":    LET,
+	"mut":    MUTATE,
 	"true":   TRUE,
 	"false":  FALSE,
 	"if":     IF,

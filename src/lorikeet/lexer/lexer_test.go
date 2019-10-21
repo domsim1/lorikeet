@@ -38,6 +38,7 @@ func TestNextToken(t *testing.T) {
 		 getName()|>greet("hello");
 		 1.5;
 		 fn test() {}
+		 let mut ten = 10;
 		`
 
 	tests := []struct {
@@ -172,7 +173,13 @@ func TestNextToken(t *testing.T) {
 		{token.RPAREN, ")", 30},
 		{token.LBRACE, "{", 30},
 		{token.RBRACE, "}", 30},
-		{token.EOF, "", 31},
+		{token.LET, "let", 31},
+		{token.MUTATE, "mut", 31},
+		{token.IDENT, "ten", 31},
+		{token.ASSIGN, "=", 31},
+		{token.INT, "10", 31},
+		{token.SEMICOLON, ";", 31},
+		{token.EOF, "", 32},
 	}
 
 	l := New(input)
