@@ -20,6 +20,7 @@ type Symbol struct {
 	Name  string
 	Scope SymbolScope
 	Index int
+	Mut   bool
 }
 
 // SymbolTable store for symbols
@@ -40,8 +41,8 @@ func NewSymbolTable() *SymbolTable {
 }
 
 // Define symbol in symbol table
-func (s *SymbolTable) Define(name string) (Symbol, error) {
-	symbol := Symbol{Name: name, Index: s.numDefinitions}
+func (s *SymbolTable) Define(name string, mut bool) (Symbol, error) {
+	symbol := Symbol{Name: name, Index: s.numDefinitions, Mut: mut}
 	if s.Outer == nil {
 		symbol.Scope = GlobalScope
 	} else {
@@ -51,7 +52,7 @@ func (s *SymbolTable) Define(name string) (Symbol, error) {
 	obj, ok := s.Resolve(name)
 	if ok {
 		if symbol.Scope == obj.Scope {
-			return obj, fmt.Errorf("symbol %s has already been declared",
+			return obj, fmt.Errorf("symbol %s is already declared",
 				obj.Name)
 		}
 	}

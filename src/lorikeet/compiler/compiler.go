@@ -115,7 +115,8 @@ func (c *Compiler) Compile(node ast.Node) error {
 		case "!=":
 			c.emit(code.OpNotEqual)
 		default:
-			return fmt.Errorf("unknown operator %s", node.Operator)
+			return fmt.Errorf("unknown operator %s; line=%d",
+				node.Operator, node.Token.Line)
 		}
 
 	case *ast.IntegerLiteral:
@@ -138,7 +139,8 @@ func (c *Compiler) Compile(node ast.Node) error {
 		case "$":
 			call, ok := node.Right.(*ast.CallExpression)
 			if !ok {
-				return fmt.Errorf("unexpected operator after $")
+				return fmt.Errorf("unexpected operator after $; line=%d",
+					node.Token.Line)
 			}
 			err := c.Compile(call.Function)
 			if err != nil {
@@ -166,7 +168,8 @@ func (c *Compiler) Compile(node ast.Node) error {
 		case "-":
 			c.emit(code.OpMinus)
 		default:
-			return fmt.Errorf("unknown operator %s", node.Operator)
+			return fmt.Errorf("unknown operator %s; line=%d",
+				node.Operator, node.Token.Line)
 		}
 
 	case *ast.IfExpression:
@@ -218,7 +221,7 @@ func (c *Compiler) Compile(node ast.Node) error {
 		}
 
 	case *ast.LetStatement:
-		symbol, err := c.symbolTable.Define(node.Name.Value)
+		symbol, err := c.symbolTable.Define(node.Name.Value, node.Mut)
 		if err != nil {
 			return err
 		}
@@ -233,10 +236,33 @@ func (c *Compiler) Compile(node ast.Node) error {
 			c.emit(code.OpSetLocal, symbol.Index)
 		}
 
+	case *ast.MutStatement:
+		symbol, ok := c.symbolTable.Resolve(node.Name.Value)
+		if !ok {
+			return fmt.Errorf("the symbol %s is not defined; line=%d",
+				node.Name.Value, node.Token.Line)
+		}
+		if !symbol.Mut {
+			return fmt.Errorf("can't mutate constant symbol %s; line=%d",
+				node.Name.Value, node.Token.Line)
+		}
+
+		err := c.Compile(node.Value)
+		if err != nil {
+			return err
+		}
+
+		if symbol.Scope == GlobalScope {
+			c.emit(code.OpSetGlobal, symbol.Index)
+		} else {
+			c.emit(code.OpSetLocal, symbol.Index)
+		}
+
 	case *ast.Identifier:
 		symbol, ok := c.symbolTable.Resolve(node.Value)
 		if !ok {
-			return fmt.Errorf("undefined variable %s", node.Value)
+			return fmt.Errorf("undefined variable %s; line=%d",
+				node.Value, node.Token.Line)
 		}
 
 		c.loadSymbol(symbol)
@@ -298,7 +324,7 @@ func (c *Compiler) Compile(node ast.Node) error {
 		}
 
 		for _, p := range node.Parameters {
-			c.symbolTable.Define(p.Value)
+			c.symbolTable.Define(p.Value, false)
 		}
 
 		err := c.Compile(node.Body)

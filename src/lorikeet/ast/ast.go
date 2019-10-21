@@ -59,6 +59,7 @@ type LetStatement struct {
 	Token token.Token // the token.LET token
 	Name  *Identifier
 	Value Expression
+	Mut   bool
 }
 
 func (ls *LetStatement) statementNode() {}
@@ -153,6 +154,36 @@ func (bs *BlockStatement) String() string {
 
 // Line return line number
 func (bs *BlockStatement) Line() int { return bs.Token.Line }
+
+// MutStatement node
+type MutStatement struct {
+	Token token.Token // the ASSIGN token
+	Name  *Identifier
+	Value Expression
+}
+
+func (ms *MutStatement) statementNode() {}
+
+// TokenLiteral return literal for mut statement
+func (ms *MutStatement) TokenLiteral() string { return ms.Token.Literal }
+func (ms *MutStatement) String() string {
+	var out bytes.Buffer
+
+	out.WriteString(ms.Name.String())
+	out.WriteString(" = ")
+	out.WriteString(ms.TokenLiteral() + " ")
+
+	if ms.Value != nil {
+		out.WriteString(ms.Value.String())
+	}
+
+	out.WriteString(";")
+
+	return out.String()
+}
+
+// Line return line number
+func (ms *MutStatement) Line() int { return ms.Token.Line }
 
 // Expressions
 

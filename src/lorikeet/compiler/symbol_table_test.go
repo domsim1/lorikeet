@@ -14,7 +14,7 @@ func TestDefine(t *testing.T) {
 
 	global := NewSymbolTable()
 
-	a, err := global.Define("a")
+	a, err := global.Define("a", false)
 	if err != nil {
 		t.Errorf("unexpected error: %s", err)
 	}
@@ -22,7 +22,7 @@ func TestDefine(t *testing.T) {
 		t.Errorf("expected a=%+v, got=%+v", expected["a"], a)
 	}
 
-	b, err := global.Define("b")
+	b, err := global.Define("b", false)
 	if err != nil {
 		t.Errorf("unexpected error: %s", err)
 	}
@@ -32,7 +32,7 @@ func TestDefine(t *testing.T) {
 
 	firstLocal := NewEnclosedSymbolTable(global)
 
-	c, err := firstLocal.Define("c")
+	c, err := firstLocal.Define("c", false)
 	if err != nil {
 		t.Errorf("unexpected error: %s", err)
 	}
@@ -40,7 +40,7 @@ func TestDefine(t *testing.T) {
 		t.Errorf("expected c=%+v, got=%+v", expected["c"], c)
 	}
 
-	d, err := firstLocal.Define("d")
+	d, err := firstLocal.Define("d", false)
 	if err != nil {
 		t.Errorf("unexpected error: %s", err)
 	}
@@ -50,7 +50,7 @@ func TestDefine(t *testing.T) {
 
 	secondLocal := NewEnclosedSymbolTable(firstLocal)
 
-	e, err := secondLocal.Define("e")
+	e, err := secondLocal.Define("e", false)
 	if err != nil {
 		t.Errorf("unexpected error: %s", err)
 	}
@@ -58,7 +58,7 @@ func TestDefine(t *testing.T) {
 		t.Errorf("expected e=%+v, got=%+v", expected["e"], e)
 	}
 
-	f, err := secondLocal.Define("f")
+	f, err := secondLocal.Define("f", false)
 	if err != nil {
 		t.Errorf("unexpected error: %s", err)
 	}
@@ -69,8 +69,8 @@ func TestDefine(t *testing.T) {
 
 func TestResolveGlobal(t *testing.T) {
 	global := NewSymbolTable()
-	global.Define("a")
-	global.Define("b")
+	global.Define("a", false)
+	global.Define("b", false)
 
 	expected := []Symbol{
 		Symbol{Name: "a", Scope: GlobalScope, Index: 0},
@@ -92,16 +92,16 @@ func TestResolveGlobal(t *testing.T) {
 
 func TestResolveFree(t *testing.T) {
 	global := NewSymbolTable()
-	global.Define("a")
-	global.Define("b")
+	global.Define("a", false)
+	global.Define("b", false)
 
 	firstLocal := NewEnclosedSymbolTable(global)
-	firstLocal.Define("c")
-	firstLocal.Define("d")
+	firstLocal.Define("c", false)
+	firstLocal.Define("d", false)
 
 	secondLocal := NewEnclosedSymbolTable(firstLocal)
-	secondLocal.Define("e")
-	secondLocal.Define("f")
+	secondLocal.Define("e", false)
+	secondLocal.Define("f", false)
 
 	tests := []struct {
 		table               *SymbolTable
@@ -166,14 +166,14 @@ func TestResolveFree(t *testing.T) {
 
 func TestResolveUnresolvableFree(t *testing.T) {
 	global := NewSymbolTable()
-	global.Define("a")
+	global.Define("a", false)
 
 	firstLocal := NewEnclosedSymbolTable(global)
-	firstLocal.Define("c")
+	firstLocal.Define("c", false)
 
 	secondLocal := NewEnclosedSymbolTable(firstLocal)
-	secondLocal.Define("e")
-	secondLocal.Define("f")
+	secondLocal.Define("e", false)
+	secondLocal.Define("f", false)
 
 	expected := []Symbol{
 		Symbol{Name: "a", Scope: GlobalScope, Index: 0},
@@ -209,12 +209,12 @@ func TestResolveUnresolvableFree(t *testing.T) {
 
 func TestResolveLocal(t *testing.T) {
 	global := NewSymbolTable()
-	global.Define("a")
-	global.Define("b")
+	global.Define("a", false)
+	global.Define("b", false)
 
 	local := NewEnclosedSymbolTable(global)
-	local.Define("c")
-	local.Define("d")
+	local.Define("c", false)
+	local.Define("d", false)
 
 	expected := []Symbol{
 		Symbol{Name: "a", Scope: GlobalScope, Index: 0},
@@ -238,16 +238,16 @@ func TestResolveLocal(t *testing.T) {
 
 func TestResolveNestedLocal(t *testing.T) {
 	global := NewSymbolTable()
-	global.Define("a")
-	global.Define("b")
+	global.Define("a", false)
+	global.Define("b", false)
 
 	firstLocal := NewEnclosedSymbolTable(global)
-	firstLocal.Define("c")
-	firstLocal.Define("d")
+	firstLocal.Define("c", false)
+	firstLocal.Define("d", false)
 
 	secondLocal := NewEnclosedSymbolTable(firstLocal)
-	secondLocal.Define("e")
-	secondLocal.Define("f")
+	secondLocal.Define("e", false)
+	secondLocal.Define("f", false)
 
 	tests := []struct {
 		table           *SymbolTable
@@ -339,7 +339,7 @@ func TestDefineAndResolveFunctionName(t *testing.T) {
 func TestShadowingFunctionName(t *testing.T) {
 	global := NewSymbolTable()
 	global.DefineFunctionName("a")
-	global.Define("a")
+	global.Define("a", false)
 
 	expected := Symbol{Name: "a", Scope: GlobalScope, Index: 0}
 

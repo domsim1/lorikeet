@@ -41,6 +41,40 @@ func TestLetStatements(t *testing.T) {
 	}
 }
 
+func TestMutStatements(t *testing.T) {
+	tests := []struct {
+		input              string
+		expectedIdentifier string
+		expectedValue      interface{}
+	}{
+		{"x = 5;", "x", 5},
+		{"y = true;", "y", true},
+		{"foobar = y;", "foobar", "y"},
+	}
+
+	for _, tt := range tests {
+		l := lexer.New(tt.input)
+		p := New(l)
+		program := p.ParseProgram()
+		checkParserErrors(t, p)
+
+		if len(program.Statements) != 1 {
+			t.Fatalf("program.Statements does not contain 1 statements. got=%d",
+				len(program.Statements))
+		}
+
+		stmt := program.Statements[0]
+		if !testMutStatement(t, stmt, tt.expectedIdentifier) {
+			return
+		}
+
+		val := stmt.(*ast.MutStatement).Value
+		if !testLiteralExpression(t, val, tt.expectedValue) {
+			return
+		}
+	}
+}
+
 func TestReturnStatements(t *testing.T) {
 	tests := []struct {
 		input         string
@@ -171,7 +205,7 @@ func TestFloatLiteralExpression(t *testing.T) {
 }
 
 func TestParsingPrefixExpressionOnCall(t *testing.T) {
-	input := "$do()"
+	input := "$do();"
 	l := lexer.New(input)
 	p := New(l)
 	program := p.ParseProgram()
@@ -274,9 +308,9 @@ func TestParsingInfixExpressions(t *testing.T) {
 		{"foobar < barfoo;", "foobar", "<", "barfoo"},
 		{"foobar == barfoo;", "foobar", "==", "barfoo"},
 		{"foobar != barfoo;", "foobar", "!=", "barfoo"},
-		{"true == true", true, "==", true},
-		{"true != false", true, "!=", false},
-		{"false == false", false, "==", false},
+		{"true == true;", true, "==", true},
+		{"true != false;", true, "!=", false},
+		{"false == false;", false, "==", false},
 	}
 
 	for _, tt := range infixTests {
@@ -309,111 +343,111 @@ func TestOperatorPrecedenceParsing(t *testing.T) {
 		expected string
 	}{
 		{
-			"-a * b",
+			"-a * b;",
 			"((-a) * b)",
 		},
 		{
-			"!-a",
+			"!-a;",
 			"(!(-a))",
 		},
 		{
-			"a + b + c",
+			"a + b + c;",
 			"((a + b) + c)",
 		},
 		{
-			"a + b - c",
+			"a + b - c;",
 			"((a + b) - c)",
 		},
 		{
-			"a * b * c",
+			"a * b * c;",
 			"((a * b) * c)",
 		},
 		{
-			"a * b / c",
+			"a * b / c;",
 			"((a * b) / c)",
 		},
 		{
-			"a + b / c",
+			"a + b / c;",
 			"(a + (b / c))",
 		},
 		{
-			"a + b * c + d / e - f",
+			"a + b * c + d / e - f;",
 			"(((a + (b * c)) + (d / e)) - f)",
 		},
 		{
-			"3 + 4; -5 * 5",
+			"3 + 4; -5 * 5;",
 			"(3 + 4)((-5) * 5)",
 		},
 		{
-			"5 > 4 == 3 < 4",
+			"5 > 4 == 3 < 4;",
 			"((5 > 4) == (3 < 4))",
 		},
 		{
-			"5 < 4 != 3 > 4",
+			"5 < 4 != 3 > 4;",
 			"((5 < 4) != (3 > 4))",
 		},
 		{
-			"3 + 4 * 5 == 3 * 1 + 4 * 5",
+			"3 + 4 * 5 == 3 * 1 + 4 * 5;",
 			"((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))",
 		},
 		{
-			"true",
+			"true;",
 			"true",
 		},
 		{
-			"false",
+			"false;",
 			"false",
 		},
 		{
-			"3 > 5 == false",
+			"3 > 5 == false;",
 			"((3 > 5) == false)",
 		},
 		{
-			"3 < 5 == true",
+			"3 < 5 == true;",
 			"((3 < 5) == true)",
 		},
 		{
-			"1 + (2 + 3) + 4",
+			"1 + (2 + 3) + 4;",
 			"((1 + (2 + 3)) + 4)",
 		},
 		{
-			"(5 + 5) * 2",
+			"(5 + 5) * 2;",
 			"((5 + 5) * 2)",
 		},
 		{
-			"2 / (5 + 5)",
+			"2 / (5 + 5);",
 			"(2 / (5 + 5))",
 		},
 		{
-			"(5 + 5) * 2 * (5 + 5)",
+			"(5 + 5) * 2 * (5 + 5);",
 			"(((5 + 5) * 2) * (5 + 5))",
 		},
 		{
-			"-(5 + 5)",
+			"-(5 + 5);",
 			"(-(5 + 5))",
 		},
 		{
-			"!(true == true)",
+			"!(true == true);",
 			"(!(true == true))",
 		},
 		{
-			"a + add(b * c) + d",
+			"a + add(b * c) + d;",
 			"((a + add((b * c))) + d)",
 		},
 		{
-			"add(a, b, 1, 2 * 3, 4 + 5, add(6, 7 * 8))",
+			"add(a, b, 1, 2 * 3, 4 + 5, add(6, 7 * 8));",
 			"add(a, b, 1, (2 * 3), (4 + 5), add(6, (7 * 8)))",
 		},
 		{
-			"add(a + b + c * d / f + g)",
+			"add(a + b + c * d / f + g);",
 			"add((((a + b) + ((c * d) / f)) + g))",
 		},
 		{
-			"a * [1, 2, 3, 4][b * c] * d",
+			"a * [1, 2, 3, 4][b * c] * d;",
 			"((a * ([1, 2, 3, 4][(b * c)])) * d)",
 		},
 		{
-			"add(a *b[2], b[1], 2 * [1, 2][1])",
+			"add(a *b[2], b[1], 2 * [1, 2][1]);",
 			"add((a * (b[2])), (b[1]), (2 * ([1, 2][1])))",
 		},
 	}
@@ -837,6 +871,32 @@ func testLetStatement(t *testing.T, s ast.Statement, name string) bool {
 	if letStmt.Name.TokenLiteral() != name {
 		t.Errorf("letStmt.Name.TokenLiteral() not '%s'. got=%s",
 			name, letStmt.Name.TokenLiteral())
+		return false
+	}
+
+	return true
+}
+
+func testMutStatement(t *testing.T, s ast.Statement, name string) bool {
+	if s.TokenLiteral() != "=" {
+		t.Errorf("s.TokenLiteral not '='. got=%q", s.TokenLiteral())
+		return false
+	}
+
+	asStmt, ok := s.(*ast.MutStatement)
+	if !ok {
+		t.Errorf("s not *ast.MutStatement. got=%T", s)
+		return false
+	}
+
+	if asStmt.Name.Value != name {
+		t.Errorf("asStmt.Name.Value not '%s'. got=%s", name, asStmt.Name.Value)
+		return false
+	}
+
+	if asStmt.Name.TokenLiteral() != name {
+		t.Errorf("asStmt.Name.TokenLiteral() not '%s'. got=%s",
+			name, asStmt.Name.TokenLiteral())
 		return false
 	}
 

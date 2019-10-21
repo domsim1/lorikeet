@@ -166,6 +166,11 @@ func (p *Parser) parseStatement() ast.Statement {
 			return p.parseExpressionStatement()
 		}
 		return p.parseFunctionStatement()
+	case token.IDENT:
+		if p.isAssignment() {
+			return p.parseMutStatement()
+		}
+		return p.parseExpressionStatement()
 	default:
 		return p.parseExpressionStatement()
 	}
@@ -174,7 +179,8 @@ func (p *Parser) parseStatement() ast.Statement {
 func (p *Parser) parseLetStatement() *ast.LetStatement {
 	stmt := &ast.LetStatement{Token: p.curToken}
 
-	if p.peekTokenIs(token.MUTATE) {
+	stmt.Mut = p.peekTokenIs(token.MUTATE)
+	if stmt.Mut {
 		p.nextToken()
 	}
 
@@ -228,6 +234,29 @@ func (p *Parser) parseFunctionStatement() *ast.LetStatement {
 	lit.Body = p.parseBlockStatement()
 
 	stmt.Value = lit
+
+	return stmt
+}
+
+func (p *Parser) parseMutStatement() *ast.MutStatement {
+	stmt := &ast.MutStatement{}
+	stmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+
+	if !p.expectPeek(token.ASSIGN) {
+		return nil
+	}
+	stmt.Token = p.curToken
+
+	p.nextToken()
+
+	stmt.Value = p.parseExpression(LOWEST)
+	if fl, ok := stmt.Value.(*ast.FunctionLiteral); ok {
+		fl.Name = stmt.Name.Value
+	}
+
+	if p.peekTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
 
 	return stmt
 }
@@ -468,6 +497,10 @@ func (p *Parser) parseFunctionLiteral() ast.Expression {
 
 func (p *Parser) isFunctionLiteral() bool {
 	return !p.peekTokenIs(token.IDENT)
+}
+
+func (p *Parser) isAssignment() bool {
+	return p.peekTokenIs(token.ASSIGN)
 }
 
 func (p *Parser) parseFunctionParameters() []*ast.Identifier {
