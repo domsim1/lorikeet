@@ -162,6 +162,9 @@ func (p *Parser) parseStatement() ast.Statement {
 	case token.RETURN:
 		return p.parseReturnStatement()
 	case token.FUNCTION:
+		if p.isFunctionLiteral() {
+			return p.parseExpressionStatement()
+		}
 		return p.parseFunctionStatement()
 	default:
 		return p.parseExpressionStatement()
@@ -170,6 +173,10 @@ func (p *Parser) parseStatement() ast.Statement {
 
 func (p *Parser) parseLetStatement() *ast.LetStatement {
 	stmt := &ast.LetStatement{Token: p.curToken}
+
+	if p.peekTokenIs(token.MUTATE) {
+		p.nextToken()
+	}
 
 	if !p.expectPeek(token.IDENT) {
 		return nil
@@ -457,6 +464,10 @@ func (p *Parser) parseFunctionLiteral() ast.Expression {
 	lit.Body = p.parseBlockStatement()
 
 	return lit
+}
+
+func (p *Parser) isFunctionLiteral() bool {
+	return !p.peekTokenIs(token.IDENT)
 }
 
 func (p *Parser) parseFunctionParameters() []*ast.Identifier {
