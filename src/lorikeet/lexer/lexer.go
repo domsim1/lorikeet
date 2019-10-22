@@ -26,6 +26,7 @@ func (l *Lexer) NextToken() token.Token {
 	var tok token.Token
 
 	l.skipWhitespace()
+	l.skipComments()
 
 	switch l.ru {
 	case '=':
@@ -143,6 +144,15 @@ func (l *Lexer) skipWhitespace() {
 			l.linePosition++
 		}
 		l.readRune()
+	}
+}
+
+func (l *Lexer) skipComments() {
+	for l.ru == '/' && l.peekRune() == '/' {
+		for l.ru != '\n' {
+			l.readRune()
+		}
+		l.skipWhitespace()
 	}
 }
 
