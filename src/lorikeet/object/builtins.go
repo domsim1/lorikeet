@@ -38,9 +38,13 @@ var Builtins = []struct {
 		"say",
 		&Builtin{Fn: func(args ...Object) Object {
 			for _, arg := range args {
-				fmt.Println(arg.Inspect())
+				s, err := strconv.Unquote(`"` + arg.Inspect() + `"`)
+				if err != nil {
+					panic(err)
+				}
+				fmt.Print(s)
 			}
-
+			fmt.Print("\n")
 			return nil
 		},
 		},
