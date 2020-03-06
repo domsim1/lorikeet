@@ -264,7 +264,17 @@ func (p *Parser) parseMutStatement() *ast.MutStatement {
 func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 	stmt := &ast.ReturnStatement{Token: p.curToken}
 
+	if p.peekTokenIs(token.RBRACE) {
+		stmt.ReturnValue = nil
+		return stmt
+	}
+
 	p.nextToken()
+
+	if p.curTokenIs(token.SEMICOLON) {
+		stmt.ReturnValue = nil
+		return stmt
+	}
 
 	stmt.ReturnValue = p.parseExpression(LOWEST)
 
@@ -474,7 +484,7 @@ func (p *Parser) parseFunctionLiteral() ast.Expression {
 
 	if p.peekTokenIs(token.IDENT) {
 		p.nextToken()
-		msg := fmt.Sprintf("functions assigned to variables must be anonymus, name %s found; line=%d",
+		msg := fmt.Sprintf("functions assigned to variables must be anonymous, name %s found; line=%d",
 			p.curToken.Literal, p.curToken.Line)
 		p.errors = append(p.errors, msg)
 		return nil

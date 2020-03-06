@@ -356,11 +356,14 @@ func (c *Compiler) Compile(node ast.Node) error {
 		c.emit(code.OpClosure, fnIndex, len(freeSymbols))
 
 	case *ast.ReturnStatement:
-		err := c.Compile(node.ReturnValue)
-		if err != nil {
-			return err
+		if node.ReturnValue != nil {
+			err := c.Compile(node.ReturnValue)
+			if err != nil {
+				return err
+			}
+		} else {
+			c.emit(code.OpNull)
 		}
-
 		c.emit(code.OpReturnValue)
 
 	case *ast.CallExpression:

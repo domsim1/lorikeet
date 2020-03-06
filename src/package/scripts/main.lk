@@ -1,19 +1,4 @@
-let map = fn(list, method) {
-  let apply = fn(old, new) {
-    if (len(old) == 0) { return new; }
-    $  old 
-    |> head() 
-    |> method() 
-    |> push(new) 
-    |> apply(tail(old))
-  };
-  $apply(list, []);
+let main = fn() {
+    return
 }
-
-let list = [1, 2, 3, 4, 5, 6];
-
-let double = fn(x) {
-  x * 2;
-}
-
-say(map(list, double));
+say(5 == 5);
